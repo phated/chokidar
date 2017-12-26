@@ -8,13 +8,13 @@ var sinon = require('sinon');
 var rimraf = require('rimraf');
 var fs = require('graceful-fs');
 var sysPath = require('path');
-var upath = require('upath');
+var upath = require("upath");
 var cp = require('child_process');
 chai.use(require('sinon-chai'));
 var os = process.platform;
 
 function getFixturePath (subPath) {
-  return upath.join(
+  return sysPath.join(
     __dirname,
     'test-fixtures',
     subdir && subdir.toString() || '',
@@ -801,7 +801,7 @@ function runTests(baseopts) {
     before(closeWatchers);
     var linkedDir;
     beforeEach(function(done) {
-      linkedDir = upath.resolve(fixturesPath, '..', subdir + '-link');
+      linkedDir = sysPath.resolve(fixturesPath, '..', subdir + '-link');
       fs.symlink(fixturesPath, linkedDir, function() {
         fs.mkdir(getFixturePath('subdir'), 0x1ed, function() {
           fs.writeFile(getFixturePath('subdir/add.txt'), 'b', done);
@@ -858,7 +858,7 @@ function runTests(baseopts) {
     });
     it('should watch paths with a symlinked parent', function(done) {
       var spy = sinon.spy();
-      var testDir = upath.join(linkedDir, 'subdir');
+      var testDir = sysPath.join(linkedDir, 'subdir');
       var testFile = sysPath.join(testDir, 'add.txt');
       watcher = chokidar.watch(testDir, options)
         .on('all', spy)
@@ -966,8 +966,8 @@ function runTests(baseopts) {
       var dirSpy = sinon.spy(function dirSpy(){});
       var addSpy = sinon.spy(function addSpy(){});
       // test with relative path to ensure proper resolution
-      var watchDir = upath.relative(process.cwd(), linkedDir);
-      watcher = chokidar.watch(upath.join(watchDir, '**/*'), options)
+      var watchDir = sysPath.relative(process.cwd(), linkedDir);
+      watcher = chokidar.watch(sysPath.join(watchDir, '**/*'), options)
         .on('addDir', dirSpy)
         .on('add', addSpy)
         .on('ready', function() {
@@ -1754,7 +1754,7 @@ function runTests(baseopts) {
         .on('all', spy)
         .on('ready', w(function() {
           // test with both relative and absolute paths
-          var subdirRel = upath.relative(process.cwd(), getFixturePath('subdir'));
+          var subdirRel = sysPath.relative(process.cwd(), getFixturePath('subdir'));
           watcher.unwatch([subdirRel, getFixturePath('unl*')]);
           w(function() {
             fs.unlink(getFixturePath('unlink.txt'), simpleCb);
@@ -1772,9 +1772,9 @@ function runTests(baseopts) {
     });
     it('should unwatch relative paths', function(done) {
       var spy = sinon.spy();
-      var fixturesDir = upath.relative(process.cwd(), fixturesPath);
-      var subdir = upath.join(fixturesDir, 'subdir');
-      var changeFile = upath.join(fixturesDir, 'change.txt');
+      var fixturesDir = sysPath.relative(process.cwd(), fixturesPath);
+      var subdir = sysPath.join(fixturesDir, 'subdir');
+      var changeFile = sysPath.join(fixturesDir, 'change.txt');
       var watchPaths = [subdir, changeFile];
       watcher = chokidar.watch(watchPaths, options)
         .on('all', spy)
