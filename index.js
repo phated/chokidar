@@ -361,6 +361,7 @@ FSWatcher.prototype._isIgnored = function(path, stats) {
     }
     var paths = arrify(ignored)
       .filter(function(path) {
+        console.log(path);
         return typeof path === 'string' && !isGlob(path);
       }).map(function(path) {
         return path + '/**';
@@ -370,6 +371,7 @@ FSWatcher.prototype._isIgnored = function(path, stats) {
     );
   }
 
+  console.log(path, this._userIgnored(path));
   return this._userIgnored([path, stats]);
 };
 
