@@ -539,7 +539,9 @@ function runTests(baseopts) {
     it('should respect negated glob patterns', function(done) {
       var spy = sinon.spy();
       var testPath = getFixturePath('*');
+      console.log('testPath', testPath);
       var negatedPath = '!' + getFixturePath('*a*.txt');
+      console.log('negatedPath', negatedPath);
       var unlinkPath = getFixturePath('unlink.txt');
       watcher = chokidar.watch([testPath, negatedPath], options)
         .on('all', spy)
