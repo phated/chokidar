@@ -14,7 +14,7 @@ chai.use(require('sinon-chai'));
 var os = process.platform;
 
 function getFixturePath (subPath) {
-  return sysPath.join(
+  return upath.join(
     __dirname,
     'test-fixtures',
     subdir && subdir.toString() || '',
