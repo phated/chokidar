@@ -1,7 +1,7 @@
 'use strict';
 var EventEmitter = require('events').EventEmitter;
 var fs = require('fs');
-var sysPath = require('path');
+var upath = require('upath');
 var asyncEach = require('async-each');
 var anymatch = require('anymatch');
 var globParent = require('glob-parent');
@@ -162,7 +162,7 @@ inherits(FSWatcher, EventEmitter);
 // Returns the error if defined, otherwise the value of the
 // FSWatcher instance's `closed` flag
 FSWatcher.prototype._emit = function(event, path, val1, val2, val3) {
-  if (this.options.cwd) path = sysPath.relative(this.options.cwd, path);
+  if (this.options.cwd) path = upath.relative(this.options.cwd, path);
   var args = [event, path];
   if (val3 !== undefined) args.push(val1, val2, val3);
   else if (val2 !== undefined) args.push(val1, val2);
@@ -227,7 +227,7 @@ FSWatcher.prototype._emit = function(event, path, val1, val2, val3) {
     this.options.alwaysStat && val1 === undefined &&
     (event === 'add' || event === 'addDir' || event === 'change')
   ) {
-    var fullPath = this.options.cwd ? sysPath.join(this.options.cwd, path) : path;
+    var fullPath = this.options.cwd ? upath.join(this.options.cwd, path) : path;
     fs.stat(fullPath, function(error, stats) {
       // Suppress event when fs.stat fails, to avoid sending undefined 'stat'
       if (error || !stats) return;
@@ -294,7 +294,7 @@ FSWatcher.prototype._awaitWriteFinish = function(path, threshold, event, awfEmit
 
   var fullPath = path;
   if (this.options.cwd && !isAbsolute(path)) {
-    fullPath = sysPath.join(this.options.cwd, path);
+    fullPath = upath.join(this.options.cwd, path);
   }
 
   var now = new Date();
@@ -356,7 +356,7 @@ FSWatcher.prototype._isIgnored = function(path, stats) {
     if (cwd && ignored) {
       ignored = ignored.map(function (path) {
         if (typeof path !== 'string') return path;
-        return isAbsolute(path) ? path : sysPath.join(cwd, path);
+        return isAbsolute(path) ? path : upath.join(cwd, path);
       });
     }
     var paths = arrify(ignored)
@@ -384,7 +384,7 @@ var replacerRe = /^\.[\/\\]/;
 FSWatcher.prototype._getWatchHelpers = function(path, depth) {
   path = path.replace(replacerRe, '');
   var watchPath = depth || this.options.disableGlobbing || !isGlob(path) ? path : globParent(path);
-  var fullWatchPath = sysPath.resolve(watchPath);
+  var fullWatchPath = upath.resolve(watchPath);
   var hasGlob = watchPath !== path;
   var globFilter = hasGlob ? anymatch(path) : false;
   var follow = this.options.followSymlinks;
@@ -408,8 +408,8 @@ FSWatcher.prototype._getWatchHelpers = function(path, depth) {
   };
 
   var entryPath = function(entry) {
-    return sysPath.join(watchPath,
-      sysPath.relative(watchPath, checkGlobSymlink(entry))
+    return upath.join(watchPath,
+      upath.relative(watchPath, checkGlobSymlink(entry))
     );
   };
 
@@ -427,7 +427,7 @@ FSWatcher.prototype._getWatchHelpers = function(path, depth) {
     var parts = [];
     var expandedPath = braces.expand(path);
     expandedPath.forEach(function(path) {
-      parts.push(sysPath.relative(watchPath, path).split(/[\/\\]/));
+      parts.push(upath.relative(watchPath, path).split(/[\/\\]/));
     });
     return parts;
   };
@@ -476,7 +476,7 @@ FSWatcher.prototype._getWatchHelpers = function(path, depth) {
 //
 // Returns the directory's tracking object
 FSWatcher.prototype._getWatchedDir = function(directory) {
-  var dir = sysPath.resolve(directory);
+  var dir = upath.resolve(directory);
   var watcherRemove = this._remove.bind(this);
   if (!(dir in this._watched)) this._watched[dir] = {
     _items: Object.create(null),
@@ -487,7 +487,7 @@ FSWatcher.prototype._getWatchedDir = function(directory) {
       delete this._items[item];
       if (!this.children().length) {
         fs.readdir(dir, function(err) {
-          if (err) watcherRemove(sysPath.dirname(dir), sysPath.basename(dir));
+          if (err) watcherRemove(upath.dirname(dir), upath.basename(dir));
         });
       }
     },
@@ -522,8 +522,8 @@ FSWatcher.prototype._remove = function(directory, item) {
   // if what is being deleted is a directory, get that directory's paths
   // for recursive deleting and cleaning of watched object
   // if it is not a directory, nestedDirectoryChildren will be empty array
-  var path = sysPath.join(directory, item);
-  var fullPath = sysPath.resolve(path);
+  var path = upath.join(directory, item);
+  var fullPath = upath.resolve(path);
   var isDirectory = this._watched[path] || this._watched[fullPath];
 
   // prevent duplicate handling in case of arriving here nearly simultaneously
@@ -552,7 +552,7 @@ FSWatcher.prototype._remove = function(directory, item) {
 
   // If we wait for this file to be fully written, cancel the wait.
   var relPath = path;
-  if (this.options.cwd) relPath = sysPath.relative(this.options.cwd, path);
+  if (this.options.cwd) relPath = upath.relative(this.options.cwd, path);
   if (this.options.awaitWriteFinish && this._pendingWrites[relPath]) {
     var event = this._pendingWrites[relPath].cancelWait();
     if (event === 'add') return;
@@ -575,7 +575,7 @@ FSWatcher.prototype._closePath = function(path) {
   if (!this._closers[path]) return;
   this._closers[path]();
   delete this._closers[path];
-  this._getWatchedDir(sysPath.dirname(path)).remove(sysPath.basename(path));
+  this._getWatchedDir(upath.dirname(path)).remove(upath.basename(path));
 }
 
 // Public method: Adds paths to be watched on an existing FSWatcher instance
@@ -598,9 +598,9 @@ FSWatcher.prototype.add = function(paths, _origAdd, _internal) {
     if (isAbsolute(path)) {
       return path;
     } else if (path[0] === '!') {
-      return '!' + sysPath.join(cwd, path.substring(1));
+      return '!' + upath.join(cwd, path.substring(1));
     } else {
-      return sysPath.join(cwd, path);
+      return upath.join(cwd, path);
     }
   });
 
@@ -636,7 +636,7 @@ FSWatcher.prototype.add = function(paths, _origAdd, _internal) {
     }.bind(this), function(error, results) {
       results.forEach(function(item) {
         if (!item || this.closed) return;
-        this.add(sysPath.dirname(item), sysPath.basename(_origAdd || item));
+        this.add(upath.dirname(item), upath.basename(_origAdd || item));
       }, this);
     }.bind(this));
   }
@@ -656,8 +656,8 @@ FSWatcher.prototype.unwatch = function(paths) {
   paths.forEach(function(path) {
     // convert to absolute path unless relative path already matches
     if (!isAbsolute(path) && !this._closers[path]) {
-      if (this.options.cwd) path = sysPath.join(this.options.cwd, path);
-      path = sysPath.resolve(path);
+      if (this.options.cwd) path = upath.join(this.options.cwd, path);
+      path = upath.resolve(path);
     }
 
     this._closePath(path);
@@ -698,7 +698,7 @@ FSWatcher.prototype.close = function() {
 FSWatcher.prototype.getWatched = function() {
   var watchList = {};
   Object.keys(this._watched).forEach(function(dir) {
-    var key = this.options.cwd ? sysPath.relative(this.options.cwd, dir) : dir;
+    var key = this.options.cwd ? upath.relative(this.options.cwd, dir) : dir;
     watchList[key || '.'] = Object.keys(this._watched[dir]._items).sort();
   }.bind(this));
   return watchList;
