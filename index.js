@@ -1,7 +1,7 @@
 'use strict';
 var EventEmitter = require('events').EventEmitter;
 var fs = require('fs');
-var upath = require('upath');
+var upath = require('path-posix');
 var asyncEach = require('async-each');
 var anymatch = require('anymatch');
 var globParent = require('glob-parent');

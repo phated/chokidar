@@ -7,7 +7,7 @@ var should = chai.should();
 var sinon = require('sinon');
 var rimraf = require('rimraf');
 var fs = require('graceful-fs');
-var upath = require('upath');
+var upath = require('path-posix');
 var cp = require('child_process');
 chai.use(require('sinon-chai'));
 var os = process.platform;
@@ -769,7 +769,7 @@ function runTests(baseopts) {
     });
     it('should correctly handle glob with braces', function(done) {
       var spy = sinon.spy();
-      var watchPath = upath.normalizeSafe(getFixturePath('{subdir/*,subdir1/subsub1}/subsubsub/*.txt'));
+      var watchPath = upath.normalize(getFixturePath('{subdir/*,subdir1/subsub1}/subsubsub/*.txt'));
       var deepFileA = getFixturePath('subdir/subsub/subsubsub/a.txt');
       var deepFileB = getFixturePath('subdir1/subsub1/subsubsub/a.txt');
       fs.mkdirSync(getFixturePath('subdir'), 0x1ed);
@@ -1145,7 +1145,7 @@ function runTests(baseopts) {
     describe('ignored', function() {
       it('should check ignore after stating', function(done) {
         options.ignored = function(path, stats) {
-          if (upath.normalizeSafe(path) === upath.normalizeSafe(testDir) || !stats) return false;
+          if (upath.normalize(path) === upath.normalize(testDir) || !stats) return false;
           return stats.isDirectory();
         };
         var spy = sinon.spy();
