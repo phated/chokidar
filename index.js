@@ -606,7 +606,8 @@ FSWatcher.prototype.add = function(paths, _origAdd, _internal) {
       absPath = sysPath.join(cwd, path);
     }
 
-    if (disableGlobbing || !isGlob(absPath)) {
+    // Check `path` instead of `absPath` because the cwd portion can't be a glob
+    if (disableGlobbing || !isGlob(path)) {
       return absPath;
     } else {
       return normalizePath(absPath);
