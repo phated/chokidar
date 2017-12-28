@@ -720,6 +720,7 @@ function runTests(baseopts) {
       watcher = chokidar.watch(watchPath, options)
         .on('all', spy)
         .on('ready', function() {
+          console.log(spy.args);
           spy.should.have.been.calledWith('add', filePath);
           spy.should.not.have.been.calledWith('addDir', matchingDir);
           spy.should.not.have.been.calledWith('add', matchingFile);
