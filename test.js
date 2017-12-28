@@ -709,6 +709,7 @@ function runTests(baseopts) {
       options.disableGlobbing = true;
       var spy = sinon.spy();
       var filePath = getFixturePath('nota[glob]');
+      // This isn't using getGlobPath because it isn't treated as a glob
       var watchPath = getFixturePath('nota[glob]');
       var matchingDir = getFixturePath('notag');
       var matchingFile = getFixturePath('notag/a.txt');
@@ -720,7 +721,6 @@ function runTests(baseopts) {
       watcher = chokidar.watch(watchPath, options)
         .on('all', spy)
         .on('ready', function() {
-          console.log(spy.args);
           spy.should.have.been.calledWith('add', filePath);
           spy.should.not.have.been.calledWith('addDir', matchingDir);
           spy.should.not.have.been.calledWith('add', matchingFile);
@@ -1445,7 +1445,8 @@ function runTests(baseopts) {
           }));
       });
       it('should ignore files even with cwd', function(done) {
-        options.cwd = fixturesPath;
+        // TODO: Should cwd be normalized in core when combined with a glob path?
+        options.cwd = getGlobPath(fixturesPath);
         options.ignored = 'ignored-option.txt';
         var spy = sinon.spy();
         var files = [
