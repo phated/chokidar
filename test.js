@@ -1445,7 +1445,7 @@ function runTests(baseopts) {
           }));
       });
       it('should ignore files even with cwd', function(done) {
-        options.cwd = upath.normalizeSafe(fixturesPath);
+        options.cwd = fixturesPath;
         options.ignored = 'ignored-option.txt';
         var spy = sinon.spy();
         var files = [
@@ -1466,7 +1466,6 @@ function runTests(baseopts) {
               fs.writeFile(getFixturePath('change.txt'), 'change', simpleCb);
             }, (win32Polling010) ? 1000 : undefined)();
             waitFor([spy.withArgs('change', 'change.txt')], function() {
-              console.log(spy.args);
               spy.should.have.been.calledWith('add', 'change.txt');
               spy.should.not.have.been.calledWith('add', 'ignored.txt');
               spy.should.not.have.been.calledWith('add', 'ignored-option.txt');
