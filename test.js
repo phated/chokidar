@@ -681,7 +681,7 @@ function runTests(baseopts) {
       options.disableGlobbing = true;
       var spy = sinon.spy();
       var filePath = getFixturePath('nota[glob]/a.txt');
-      var watchPath = getGlobPath('nota[glob]');
+      var watchPath = getFixturePath('nota[glob]');
       var testDir = getFixturePath('nota[glob]');
       var matchingDir = getFixturePath('notag');
       var matchingFile = getFixturePath('notag/b.txt');
@@ -709,7 +709,7 @@ function runTests(baseopts) {
       options.disableGlobbing = true;
       var spy = sinon.spy();
       var filePath = getFixturePath('nota[glob]');
-      var watchPath = getGlobPath('nota[glob]');
+      var watchPath = getFixturePath('nota[glob]');
       var matchingDir = getFixturePath('notag');
       var matchingFile = getFixturePath('notag/a.txt');
       var matchingFile2 = getFixturePath('notal');
@@ -1466,6 +1466,7 @@ function runTests(baseopts) {
               fs.writeFile(getFixturePath('change.txt'), 'change', simpleCb);
             }, (win32Polling010) ? 1000 : undefined)();
             waitFor([spy.withArgs('change', 'change.txt')], function() {
+              console.log(spy.args);
               spy.should.have.been.calledWith('add', 'change.txt');
               spy.should.not.have.been.calledWith('add', 'ignored.txt');
               spy.should.not.have.been.calledWith('add', 'ignored-option.txt');
