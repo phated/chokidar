@@ -513,6 +513,7 @@ function runTests(baseopts) {
             }, win32Polling010 ? 900 : undefined));
           }, win32Polling010 ? 900 : undefined)();
           waitFor([spy.withArgs('add')], function() {
+            console.log(spy.args);
             spy.should.have.been.calledWith('addDir', testDir);
             spy.should.have.been.calledWith('add', testPath);
             done();
