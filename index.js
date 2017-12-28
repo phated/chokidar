@@ -613,6 +613,8 @@ FSWatcher.prototype.add = function(paths, _origAdd, _internal) {
     }
   });
 
+  console.log(paths);
+
   // set aside negated glob strings
   paths = paths.filter(function(path) {
     if (path[0] === '!') {
