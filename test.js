@@ -1445,8 +1445,7 @@ function runTests(baseopts) {
           }));
       });
       it('should ignore files even with cwd', function(done) {
-        // TODO: Should cwd be normalized in core when combined with a glob path?
-        options.cwd = getGlobPath(fixturesPath);
+        options.cwd = upath.normalizeSafe(fixturesPath);
         options.ignored = 'ignored-option.txt';
         var spy = sinon.spy();
         var files = [
